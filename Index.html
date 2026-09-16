@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>ApexPay — M-PESA Payments</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #080d1c;
+      color: white;
+    }
+
+    .container {
+      max-width: 500px;
+      margin: auto;
+      padding: 20px;
+    }
+
+    .card {
+      background: #151c32;
+      border-radius: 20px;
+      padding: 25px;
+      margin-top: 40px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+    }
+
+    .logo {
+      font-size: 32px;
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+
+    .subtitle {
+      color: #aeb6cc;
+      margin-bottom: 25px;
+    }
+
+    .badge {
+      display: inline-block;
+      background: #163b2b;
+      color: #72ffae;
+      padding: 7px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: bold;
+      margin-bottom: 15px;
+    }
+
+    label {
+      display: block;
+      margin-top: 18px;
+      margin-bottom: 7px;
+      font-weight: bold;
+    }
+
+    input {
+      width: 100%;
+      padding: 15px;
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      outline: none;
+    }
+
+    button {
+      width: 100%;
+      padding: 16px;
+      margin-top: 22px;
+      border: none;
+      border-radius: 10px;
+      background: #ffd400;
+      color: #111;
+      font-size: 17px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    button:active {
+      transform: scale(0.98);
+    }
+
+    .status {
+      margin-top: 18px;
+      padding: 14px;
+      background: #0e1428;
+      border-radius: 10px;
+      color: #d7dced;
+      line-height: 1.5;
+    }
+
+    .footer {
+      margin-top: 25px;
+      color: #858da5;
+      font-size: 13px;
+      text-align: center;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="container">
+
+    <div class="card">
+
+      <div class="badge">
+        DARAJA SANDBOX
+      </div>
+
+      <div class="logo">
+        ApexPay
+      </div>
+
+      <div class="subtitle">
+        Simple M-PESA payment links
+      </div>
+
+      <label for="amount">
+        Amount (KSh)
+      </label>
+
+      <input
+        type="number"
+        id="amount"
+        value="500"
+        min="1"
+        placeholder="Enter amount"
+      >
+
+      <label for="phone">
+        M-PESA Phone Number
+      </label>
+
+      <input
+        type="tel"
+        id="phone"
+        placeholder="0712345678"
+      >
+
+      <button onclick="requestPayment()">
+        Pay with M-PESA
+      </button>
+
+      <div class="status" id="status">
+        Enter the amount and phone number to begin.
+      </div>
+
+      <div class="footer">
+        ApexPay payment system • Sandbox testing
+      </div>
+
+    </div>
+
+  </div>
+
+  <script>
+
+    async function requestPayment() {
+
+      const amount =
+        document.getElementById("amount").value;
+
+      const phone =
+        document.getElementById("phone").value;
+
+      const status =
+        document.getElementById("status");
+
+      if (!amount || amount < 1) {
+        status.innerText =
+          "Please enter a valid amount.";
+        return;
+      }
+
+      if (!phone) {
+        status.innerText =
+          "Please enter your M-PESA phone number.";
+        return;
+      }
+
+      status.innerText =
+        "Connecting to ApexPay...";
+
+      try {
+
+        const response = await fetch(
+          "/api/stkpush",
+          {
+            method: "POST",
+
+            headers: {
+              "Content-Type": "application/json"
+            },
+
+            body: JSON.stringify({
+              amount: amount,
+              phone: phone
+            })
+          }
+        );
+
+        const data =
+          await response.json();
+
+        status.innerText =
+          data.message ||
+          "Payment request completed.";
+
+      } catch (error) {
+
+        status.innerText =
+          "The payment server is not connected yet.";
+
+      }
+
+    }
+
+  </script>
+
+</body>
+</html>
